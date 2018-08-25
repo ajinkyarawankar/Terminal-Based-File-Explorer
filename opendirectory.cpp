@@ -6,24 +6,27 @@
 #include <time.h>
 #include <sys/stat.h>
 #include <stdlib.h>
+#include<string.h>
+#include<unistd.h>
+#include<iostream>
+#include<termios.h>
 
 
 //using namespace std;
+int  lowerlimit,upperlimit;
+struct dirent **namelist;
+dirent *prev;
+dirent *current;
+int getlowerlimit(){
+	return lowerlimit;
+}
 
+int getupperlimit(){
+	return upperlimit;
+}
 
-void scanDirectory(const char *root,int flag){
-	struct dirent **namelist;
-	int i,n;
-
-	if(flag==0){
-
-    n=scandir(root,&namelist,0,alphasort);
-    if (n < 0){
-        printf("No such Directory");
-    return;
-    }
-    else {
-        for (i = 0; i < n; i++) {
+void printCustomDirectory(int lowerlimit,int currentlimit){
+	for (int i = lowerlimit; i <= currentlimit; i++) {
             printFileType(namelist[i]); 
             printFilePermissions(namelist[i]);
             printFileName(namelist[i]);
@@ -31,10 +34,78 @@ void scanDirectory(const char *root,int flag){
             printGroupName(namelist[i]);
             printFileSize(namelist[i]);
             printFileTime(namelist[i]);
-            free(namelist[i]);
+            //free(namelist[i]);
             }
+}
+void scanDirectory(const char *root,int flag){
+	//struct dirent **namelist;
+	int i,n,l;
+
+	if(flag==0){
+
+    n=scandir(root,&namelist,0,alphasort);
+    current=namelist[0];
+    if (n < 0){
+        printf("No such Directory");
+    return;
+    }
+    else {
+    	if(n>20) l=20;
+    	else l=n;
+        for (i = 0; i < l; i++) {
+            printFileType(namelist[i]); 
+            printFilePermissions(namelist[i]);
+            printFileName(namelist[i]);
+            printUserName(namelist[i]);
+            printGroupName(namelist[i]);
+            printFileSize(namelist[i]);
+            printFileTime(namelist[i]);
+            //free(namelist[i]);
+            }
+            lowerlimit=0;
+            upperlimit=n-1;
         }
 	}
+}
+
+bool checkDirectory(int c){
+	int t;
+	t=namelist[c]->d_type;
+	if(t==DT_DIR){
+		return true;
+	}
+	return false;
+}
+void scanDirectory(int c){
+	int i,n,t,l;
+
+	//n=scandir(current->d_name,&namelist,0,alphasort);
+	t=namelist[c]->d_type;
+	dirent *temp;
+	temp=namelist[c];
+	//printf("%d",t==DT_DIR);
+	if(t==DT_DIR){
+		free(namelist);
+		chdir(temp->d_name);
+		n=scandir(".",&namelist,0,alphasort);
+		prev=namelist[1];
+		current=namelist[0];
+		if(n>19) l=20;
+		else l=n;
+	for (i = 0; i < l; i++) {
+            printFileType(namelist[i]); 
+            printFilePermissions(namelist[i]);
+            printFileName(namelist[i]);
+            printUserName(namelist[i]);
+            printGroupName(namelist[i]);
+            printFileSize(namelist[i]);
+            printFileTime(namelist[i]);
+            //free(namelist[i]);
+            }
+            lowerlimit=0;
+            upperlimit=n-1;
+	}
+
 }
 
 //pass dirent pointer to that directory or file 
@@ -49,7 +120,7 @@ void printFileType(dirent *p){
 
 			if(t==DT_FIFO) printf("p ");  
 
-			//if(t==DT_LINK) printf("l");
+			if(t==DT_LNK) printf("l ");
 
 			if(t==DT_REG) printf("f ");
       
@@ -60,7 +131,7 @@ void printFileType(dirent *p){
 
 //pass dirent pointer to that directory or file
 void printFileName(dirent *p){
-	printf("%-20s",p->d_name);
+	printf("  %-20s",p->d_name);
 }
 
 //pass dirent pointer to that directory or file
@@ -115,5 +186,5 @@ void printFileSize(dirent *p){
 void printFileTime(dirent *p){
 	struct stat st;
 	stat(p->d_name, &st);
-	printf("%30s\n",ctime(&st.st_mtime));
+	printf("%30s",ctime(&st.st_mtime));
 }

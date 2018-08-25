@@ -12,5 +12,9 @@ void printUserName(dirent *);
 void printGroupName(dirent *);
 void printFileSize(dirent *);
 void printFileTime(dirent *);
-
+int getlowerlimit();
+int getupperlimit();
+void scanDirectory(int);
+bool checkDirectory(int);
+void printCustomDirectory(int ,int);
 #endif  /*INC_MODULE1_H*/
