@@ -22,7 +22,7 @@ int main(int argc, char const *argv[]){
 	setroot(root);
 	printf("\e[1J");
 	printf("\e[1;1H");
-	printf("%s",getroot());
+
 	struct termios oldt,newt;
 	tcgetattr(STDIN_FILENO,&oldt);
 	char c;
@@ -45,6 +45,20 @@ int main(int argc, char const *argv[]){
 	while(1){
 	//scanf("%s",&c);	
 		c=getchar();
+
+        //right arrow
+		if(c==67){
+			goright();
+			
+		}
+        //left arrow
+		if(c==68){
+			goleft();
+			lowerlimit=getlowerlimit();
+			upperlimit=getupperlimit();
+			current=lowerlimit;
+		}
+
 		//up arrow
 		if(c==65) {
 			if(current!=lowerlimit){

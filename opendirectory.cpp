@@ -12,6 +12,7 @@
 #include<termios.h>
 #include<sys/wait.h>
 #include<string>
+#include<stack>
 using namespace std;
 int  lowerlimit,upperlimit;
 struct dirent **namelist;
@@ -19,8 +20,8 @@ dirent *prev;
 dirent *current;
 string root;
 
-stack<dirent*> leftstack;
-stack<dirent*> rightstack;
+stack<struct dirent *> leftstack;
+stack<struct dirent *> rightstack;
 
 string getroot(){
 	return root;
@@ -38,10 +39,51 @@ int getupperlimit(){
 }
 
 void goleft(){
-
+	int n,i,l;
+	if(leftstack.empty()){
+		printf("\e[23;1H");
+		printf("\e[2K");
+		printf("No previous directory");
+		printf("\e[1;1H");
+	}
+	else{
+		printf("\e[2J");
+	    printf("\e[1;1H");
+		dirent *temp;
+		
+		temp=leftstack.top();
+		char *path=realpath(temp->d_name,NULL);
+		//printf("%s",path);
+		leftstack.pop();
+		
+		chdir(path);
+		n=scandir(".",&namelist,0,alphasort);
+		//char *r1=root;
+		char *r2=realpath(".",NULL);
+		int check=root.compare(r2);
+		if(check==0){
+			namelist[1]=namelist[0];
+		}
+		if(n>19) l=20;
+		else l=n;
+	for (i = 0; i < l; i++) {
+            printFileType(namelist[i]); 
+            printFilePermissions(namelist[i]);
+            printFileName(namelist[i]);
+            printUserName(namelist[i]);
+            printGroupName(namelist[i]);
+            printFileSize(namelist[i]);
+            printFileTime(namelist[i]);
+            //free(namelist[i]);
+        }
+            lowerlimit=0;
+            upperlimit=n-1;
+            printf("\e[1;1H");
+	}
+	
 }
 void goright(){
-	
+
 }
 void openFile(int c){
 	pid_t pid;
@@ -124,8 +166,10 @@ void scanDirectory(int c){
 	temp=namelist[c];
 	//printf("%d",t==DT_DIR);
 	if(t==DT_DIR){
+
+		leftstack.push(namelist[1]);
 		free(namelist);
-		leftstack.push(temp);
+		
 		chdir(temp->d_name);
 
 		n=scandir(".",&namelist,0,alphasort);
