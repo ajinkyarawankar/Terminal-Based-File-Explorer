@@ -4,9 +4,10 @@
 #include<unistd.h>
 #include"opendirectory.h"
 #include<termios.h>
-
+#include<sys/wait.h>
 using namespace std;
 int main(int argc, char const *argv[]){
+
 
 	const char *root;
 //	char *current_root;
@@ -21,6 +22,7 @@ int main(int argc, char const *argv[]){
 	struct termios oldt,newt;
 	tcgetattr(STDIN_FILENO,&oldt);
 	char c;
+	string s;
 	newt=oldt;
 	newt.c_lflag = newt.c_lflag & ~(ICANON);
 	newt.c_lflag=1;
@@ -95,6 +97,13 @@ int main(int argc, char const *argv[]){
 	        currentlimit=currentlimit<upperlimit?currentlimit:upperlimit;
 			//printf("%d",current);
 			}
+			else{
+				
+				openFile(current);
+				sleep(1);
+				printf("\e[1;1H");
+				current=lowerlimit;
+			}
 		}
 		//printf("%c\n",c);
 		if(c==127){
@@ -109,7 +118,9 @@ int main(int argc, char const *argv[]){
 	        currentlimit=currentlimit<upperlimit?currentlimit:upperlimit;
 		}
 		if(c==':') {
-			printf("\n");
+			printf("\e[22;1H");
+			printf("\e[2K");
+
 			break;
 		}
 
@@ -117,5 +128,23 @@ int main(int argc, char const *argv[]){
 
 
 	tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+
+
+//canonical mode 
+	while(1){
+		string command;
+		cin>>s;
+		if(s.compare(":")==0){
+			printf("\e[25;1H");
+			break;
+		}
+
+		command=s.substr(0, s.find(" "));
+		printf("\e[2K");
+		cout<<command;
+		printf("\e[22;1H");
+		printf("\e[2K");
+
+	}
 
 }

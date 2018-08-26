@@ -17,4 +17,5 @@ int getupperlimit();
 void scanDirectory(int);
 bool checkDirectory(int);
 void printCustomDirectory(int ,int);
+void openFile(int);
 #endif  /*INC_MODULE1_H*/

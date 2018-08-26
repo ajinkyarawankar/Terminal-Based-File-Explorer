@@ -10,9 +10,9 @@
 #include<unistd.h>
 #include<iostream>
 #include<termios.h>
-
-
-//using namespace std;
+#include<sys/wait.h>
+#include<string>
+using namespace std;
 int  lowerlimit,upperlimit;
 struct dirent **namelist;
 dirent *prev;
@@ -25,6 +25,26 @@ int getupperlimit(){
 	return upperlimit;
 }
 
+void openFile(int c){
+	pid_t pid;
+	int s=0;
+	int status;
+	
+				pid=fork();
+				if(pid==0){
+					printf("\e[22;1H");
+				    printf("\e[2K");
+				    printf("\n");
+					execl("/usr/bin/xdg-open","xdg-open",namelist[c]->d_name,NULL);
+					exit(1);
+					printf("\e[1;1H");
+				}
+				waitpid(pid, &status, 0);
+	
+}
+void snapshot(){
+
+}
 void printCustomDirectory(int lowerlimit,int currentlimit){
 	for (int i = lowerlimit; i <= currentlimit; i++) {
             printFileType(namelist[i]); 
@@ -88,8 +108,8 @@ void scanDirectory(int c){
 		free(namelist);
 		chdir(temp->d_name);
 		n=scandir(".",&namelist,0,alphasort);
-		prev=namelist[1];
-		current=namelist[0];
+		// prev=namelist[1];
+		// current=namelist[0];
 		if(n>19) l=20;
 		else l=n;
 	for (i = 0; i < l; i++) {
@@ -131,7 +151,10 @@ void printFileType(dirent *p){
 
 //pass dirent pointer to that directory or file
 void printFileName(dirent *p){
-	printf("  %-20s",p->d_name);
+	string s=p->d_name;
+	if(s.length()>20) s.resize(20);
+	printf("  %-20s",s.c_str());
+
 }
 
 //pass dirent pointer to that directory or file
