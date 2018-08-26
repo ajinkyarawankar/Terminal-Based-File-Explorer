@@ -17,6 +17,18 @@ int  lowerlimit,upperlimit;
 struct dirent **namelist;
 dirent *prev;
 dirent *current;
+string root;
+
+stack<dirent*> leftstack;
+stack<dirent*> rightstack;
+
+string getroot(){
+	return root;
+}
+void setroot(string rt){
+ root =rt;
+
+}
 int getlowerlimit(){
 	return lowerlimit;
 }
@@ -25,6 +37,12 @@ int getupperlimit(){
 	return upperlimit;
 }
 
+void goleft(){
+
+}
+void goright(){
+	
+}
 void openFile(int c){
 	pid_t pid;
 	int s=0;
@@ -62,7 +80,7 @@ void scanDirectory(const char *root,int flag){
 	int i,n,l;
 
 	if(flag==0){
-
+	chdir(root);
     n=scandir(root,&namelist,0,alphasort);
     current=namelist[0];
     if (n < 0){
@@ -86,6 +104,7 @@ void scanDirectory(const char *root,int flag){
             upperlimit=n-1;
         }
 	}
+	namelist[1]=current;
 }
 
 bool checkDirectory(int c){
@@ -106,10 +125,16 @@ void scanDirectory(int c){
 	//printf("%d",t==DT_DIR);
 	if(t==DT_DIR){
 		free(namelist);
+		leftstack.push(temp);
 		chdir(temp->d_name);
+
 		n=scandir(".",&namelist,0,alphasort);
-		// prev=namelist[1];
-		// current=namelist[0];
+		//char *r1=root;
+		char *r2=realpath(".",NULL);
+		int check=root.compare(r2);
+		if(check==0){
+			namelist[1]=namelist[0];
+		}
 		if(n>19) l=20;
 		else l=n;
 	for (i = 0; i < l; i++) {

@@ -5,20 +5,24 @@
 #include"opendirectory.h"
 #include<termios.h>
 #include<sys/wait.h>
+#include <sstream>
+#include<vector>
 using namespace std;
 int main(int argc, char const *argv[]){
 
 
 	const char *root;
-//	char *current_root;
+	char *current_root;
 	int lowerlimit,upperlimit,currentlimit=19,current=0;
 	if(argc==1)
-	    root=".";
+	    root=realpath(".",NULL);
 	else
-		root= argv[1];
-	
+		root=realpath(argv[1],NULL);
+
+	setroot(root);
 	printf("\e[1J");
 	printf("\e[1;1H");
+	printf("%s",getroot());
 	struct termios oldt,newt;
 	tcgetattr(STDIN_FILENO,&oldt);
 	char c;
@@ -133,15 +137,20 @@ int main(int argc, char const *argv[]){
 //canonical mode 
 	while(1){
 		string command;
-		cin>>s;
-		if(s.compare(":")==0){
+		getline(cin,s);
+		if(s.compare("exit")==0){
 			printf("\e[25;1H");
 			break;
 		}
-
-		command=s.substr(0, s.find(" "));
-		printf("\e[2K");
-		cout<<command;
+    printf("\e[2K");
+    string word;
+    vector<string> commands;
+    stringstream iss(s);
+    while (iss >> word)
+        commands.push_back(word);
+    for(int i=0;i<commands.size();i++){
+    	printf("%s ",commands[i].c_str());
+    }
 		printf("\e[22;1H");
 		printf("\e[2K");
 
