@@ -19,7 +19,7 @@ void gotot(string p){
 	root2=check.c_str();
 	chdir(root2);
     n=scandir(root2,&namelistc,0,alphasort);
-    chdir("..");
+
     free(namelistc);
     if (n < 0){
 
@@ -32,6 +32,7 @@ void gotot(string p){
     return;
     }
     else{
+    	chdir("..");
     	printf("\e[2J");
 	    printf("\e[1;1H");
 	    scandirectory(root2);
