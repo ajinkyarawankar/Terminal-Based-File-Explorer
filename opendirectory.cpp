@@ -15,6 +15,7 @@
 #include<stack>
 using namespace std;
 int  lowerlimit,upperlimit;
+
 struct dirent **namelist;
 dirent *prev;
 dirent *current;
@@ -212,6 +213,44 @@ void printCustomDirectory(int lowerlimit,int currentlimit){
             }
 }
 
+void scandirectory(const char *r){
+	int n,l,i;
+
+		char *r1=realpath(".",NULL);
+
+	    chdir(r);
+		n=scandir(".",&namelist,0,alphasort);
+		//char *r1=root;
+		char *r2=realpath(".",NULL);
+		int check=root.compare(r2);
+		if(check==0){
+			namelist[1]=namelist[0];
+		}
+
+		check=strcmp(r1,r2);
+		if(check!=0){
+			while(!rightstack.empty()){
+				rightstack.pop();
+			}	
+			leftstack.push(r1);
+		}
+
+		if(n>19) l=20;
+		else l=n;
+	for (i = 0; i < l; i++) {
+            printFileType(namelist[i]); 
+            printFilePermissions(namelist[i]);
+            printFileName(namelist[i]);
+            printUserName(namelist[i]);
+            printGroupName(namelist[i]);
+            printFileSize(namelist[i]);
+            printFileTime(namelist[i]);
+            //free(namelist[i]);
+        }
+            lowerlimit=0;
+            upperlimit=n-1;
+            printf("\e[1;1H");
+}
 //scan directory with path
 void scanDirectory(const char *root,int flag){
 	//struct dirent **namelist;

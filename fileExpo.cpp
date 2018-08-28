@@ -3,13 +3,17 @@
 #include<string.h>
 #include<unistd.h>
 #include"opendirectory.h"
+#include"commandmode.h"
 #include<termios.h>
 #include<sys/wait.h>
 #include <sstream>
 #include<vector>
+#include<map>
 using namespace std;
 int main(int argc, char const *argv[]){
 
+	map<string,int> m;
+	m[":goto"]=0;
 
 	const char *root;
 	char *current_root;
@@ -20,6 +24,7 @@ int main(int argc, char const *argv[]){
 		root=realpath(argv[1],NULL);
 
 	setroot(root);
+	setrootc(root);
 	printf("\e[1J");
 	printf("\e[1;1H");
 
@@ -30,7 +35,7 @@ int main(int argc, char const *argv[]){
 	newt=oldt;
 	newt.c_lflag = newt.c_lflag & ~(ICANON);
 	newt.c_lflag=1;
-	tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+	
 
 
 
@@ -41,7 +46,9 @@ int main(int argc, char const *argv[]){
 	lowerlimit=getlowerlimit();
 	upperlimit=getupperlimit();
 	currentlimit=currentlimit<upperlimit?currentlimit:upperlimit;
-
+NONCANONICAL:
+	tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+	printf("\e[1;1H");
 	while(1){
 	//scanf("%s",&c);	
 		c=getchar();
@@ -146,13 +153,15 @@ int main(int argc, char const *argv[]){
 			printf("\e[1;1H");
 			lowerlimit=getlowerlimit();
 			upperlimit=getupperlimit();
+			currentlimit=19;
 			currentlimit=currentlimit<upperlimit?currentlimit:upperlimit;
+			current=0;
 		}
 
 		if(c==':') {
 			printf("\e[22;1H");
 			printf("\e[2K");
-
+			printf(":");
 			break;
 		}
 
@@ -164,23 +173,44 @@ int main(int argc, char const *argv[]){
 
 //canonical mode 
 	while(1){
+
 		string command;
 		getline(cin,s);
 		if(s.compare("exit")==0){
 			printf("\e[25;1H");
 			break;
 		}
-    printf("\e[2K");
+    
     string word;
     vector<string> commands;
     stringstream iss(s);
     while (iss >> word)
         commands.push_back(word);
-    for(int i=0;i<commands.size();i++){
-    	printf("%s ",commands[i].c_str());
+    int size=commands.size();
+    if(size>1){
+    	string cs=commands[0];
+    	switch(m[cs]){
+    		case 0:
+    					gotot(commands[1]);
+    					lowerlimit=getlowerlimit();
+						upperlimit=getupperlimit();
+						currentlimit=19;
+						currentlimit=currentlimit<upperlimit?currentlimit:upperlimit;
+						current=lowerlimit;
+						goto NONCANONICAL;
+    	}
+    }
+    else{
+    	printf("\e[23;1H");
+    	printf("\e[2K");
+    	printf("invalid command");
+    	printf("\e[22;1H");
+    	printf("\e[2K");
+    	printf(":");
     }
 		printf("\e[22;1H");
 		printf("\e[2K");
+		printf(":");
 
 	}
 

@@ -7,6 +7,7 @@ using namespace std;
 #define INC_OPENDIRECTORY_H
 
 void scanDirectory(const char *,int);
+void scandirectory(const char *);
 void printFileType(dirent *); 
 void printFilePermissions(dirent *);
 void printFileName(dirent *);
