@@ -30,9 +30,9 @@ int main(){
 	while(1){
 	//scanf("%s",&c);	
 		c=getchar();
-		if(c==65) cout<<"\r\x1b[1A";
-		if(c==66) cout<<"\r\x1b[1B";
-		//printf("%c\n",c);
+		// if(c==65) cout<<"\r\x1b[1A";
+		// if(c==66) cout<<"\r\x1b[1B";
+		printf("%d\n",c);
 		
 
 	}

@@ -49,7 +49,9 @@ int main(int argc, char const *argv[]){
         //right arrow
 		if(c==67){
 			goright();
-			
+			lowerlimit=getlowerlimit();
+			upperlimit=getupperlimit();
+			current=lowerlimit;
 		}
         //left arrow
 		if(c==68){
@@ -123,7 +125,7 @@ int main(int argc, char const *argv[]){
 				current=lowerlimit;
 			}
 		}
-		//printf("%c\n",c);
+		
 		if(c==127){
 			printf("\e[2J");
 	        printf("\e[1;1H");
@@ -135,6 +137,18 @@ int main(int argc, char const *argv[]){
 	        currentlimit=19;
 	        currentlimit=currentlimit<upperlimit?currentlimit:upperlimit;
 		}
+
+
+		if(c==104){
+			printf("\e[2J");
+	        printf("\e[1;1H");
+			gohome();
+			printf("\e[1;1H");
+			lowerlimit=getlowerlimit();
+			upperlimit=getupperlimit();
+			currentlimit=currentlimit<upperlimit?currentlimit:upperlimit;
+		}
+
 		if(c==':') {
 			printf("\e[22;1H");
 			printf("\e[2K");

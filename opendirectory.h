@@ -24,4 +24,5 @@ string getroot();
 void setroot(string);
 void goleft();
 void goright();
+void gohome();
 #endif  /*INC_MODULE1_H*/

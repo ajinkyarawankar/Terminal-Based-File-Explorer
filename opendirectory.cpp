@@ -20,8 +20,8 @@ dirent *prev;
 dirent *current;
 string root;
 
-stack<struct dirent *> leftstack;
-stack<struct dirent *> rightstack;
+stack<char *> leftstack;
+stack<char *> rightstack;
 
 string getroot(){
 	return root;
@@ -38,6 +38,96 @@ int getupperlimit(){
 	return upperlimit;
 }
 
+void gohome(){
+	int i,n,l;
+	const char *cr=root.c_str();
+	// printf("%s",cr);
+	char *r2=realpath(".",NULL);
+		int check=root.compare(r2);
+		if(check!=0){
+			while(!rightstack.empty()){
+				rightstack.pop();
+			}
+			leftstack.push(r2);
+		}
+	chdir(cr);
+    n=scandir(cr,&namelist,0,alphasort);
+    current=namelist[0];
+    if (n < 0){
+        printf("No such Directory");
+    return;
+    }
+    else {
+    	if(n>20) l=20;
+    	else l=n;
+        for (i = 0; i < l; i++) {
+            printFileType(namelist[i]); 
+            printFilePermissions(namelist[i]);
+            printFileName(namelist[i]);
+            printUserName(namelist[i]);
+            printGroupName(namelist[i]);
+            printFileSize(namelist[i]);
+            printFileTime(namelist[i]);
+            //free(namelist[i]);
+            }
+            lowerlimit=0;
+            upperlimit=n-1;
+        }
+	
+	namelist[1]=current;
+}
+
+//to go forward
+void goright(){
+
+	int n,i,l;
+	if(rightstack.empty()){
+		printf("\e[23;1H");
+		printf("\e[2K");
+		printf("No directory to go forward");
+		printf("\e[1;1H");
+	}
+	else{
+		printf("\e[2J");
+	    printf("\e[1;1H");
+		dirent *temp;
+		
+		//temp=leftstack.top();
+		char *fromstack=rightstack.top();
+		char *tostack=realpath(".",NULL);
+		leftstack.push(tostack);
+		//char *path=realpath(temp->d_name,NULL);
+		//printf("%s",fromstack);
+		rightstack.pop();
+		
+		chdir(fromstack);
+		n=scandir(".",&namelist,0,alphasort);
+		//char *r1=root;
+		char *r2=realpath(".",NULL);
+		int check=root.compare(r2);
+		if(check==0){
+			namelist[1]=namelist[0];
+		}
+		if(n>19) l=20;
+		else l=n;
+	for (i = 0; i < l; i++) {
+            printFileType(namelist[i]); 
+            printFilePermissions(namelist[i]);
+            printFileName(namelist[i]);
+            printUserName(namelist[i]);
+            printGroupName(namelist[i]);
+            printFileSize(namelist[i]);
+            printFileTime(namelist[i]);
+            //free(namelist[i]);
+        }
+            lowerlimit=0;
+            upperlimit=n-1;
+            printf("\e[1;1H");
+	}
+
+}
+
+//to go backwards
 void goleft(){
 	int n,i,l;
 	if(leftstack.empty()){
@@ -51,12 +141,15 @@ void goleft(){
 	    printf("\e[1;1H");
 		dirent *temp;
 		
-		temp=leftstack.top();
-		char *path=realpath(temp->d_name,NULL);
-		//printf("%s",path);
+		//temp=leftstack.top();
+		char *fromstack=leftstack.top();
+		char *tostack=realpath(".",NULL);
+		rightstack.push(tostack);
+		//char *path=realpath(temp->d_name,NULL);
+		//printf("%s",fromstack);
 		leftstack.pop();
 		
-		chdir(path);
+		chdir(fromstack);
 		n=scandir(".",&namelist,0,alphasort);
 		//char *r1=root;
 		char *r2=realpath(".",NULL);
@@ -82,9 +175,8 @@ void goleft(){
 	}
 	
 }
-void goright(){
 
-}
+//open the file after pressing enter
 void openFile(int c){
 	pid_t pid;
 	int s=0;
@@ -105,6 +197,8 @@ void openFile(int c){
 void snapshot(){
 
 }
+
+//print directory content in the given window
 void printCustomDirectory(int lowerlimit,int currentlimit){
 	for (int i = lowerlimit; i <= currentlimit; i++) {
             printFileType(namelist[i]); 
@@ -117,6 +211,8 @@ void printCustomDirectory(int lowerlimit,int currentlimit){
             //free(namelist[i]);
             }
 }
+
+//scan directory with path
 void scanDirectory(const char *root,int flag){
 	//struct dirent **namelist;
 	int i,n,l;
@@ -149,6 +245,7 @@ void scanDirectory(const char *root,int flag){
 	namelist[1]=current;
 }
 
+//check if the current index is poinint to directory or not
 bool checkDirectory(int c){
 	int t;
 	t=namelist[c]->d_type;
@@ -157,6 +254,8 @@ bool checkDirectory(int c){
 	}
 	return false;
 }
+
+//scan directory after pressing enter with the help of indexs
 void scanDirectory(int c){
 	int i,n,t,l;
 
@@ -167,7 +266,8 @@ void scanDirectory(int c){
 	//printf("%d",t==DT_DIR);
 	if(t==DT_DIR){
 
-		leftstack.push(namelist[1]);
+		char *tostack=realpath(".",NULL);
+		leftstack.push(tostack);
 		free(namelist);
 		
 		chdir(temp->d_name);
