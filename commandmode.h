@@ -1,6 +1,6 @@
 #include<iostream>
 #include<string>
-
+#include<vector>
 using namespace std;
 
 #ifndef INC_COMMANDMODE_H
@@ -8,5 +8,7 @@ using namespace std;
 
 void gotot(string);
 void setrootc(string);
+void rname(vector<string>);
+void delfile(vector<string>);
 
 #endif

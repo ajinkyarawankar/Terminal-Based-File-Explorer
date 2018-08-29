@@ -13,7 +13,9 @@ using namespace std;
 int main(int argc, char const *argv[]){
 
 	map<string,int> m;
-	m[":goto"]=0;
+	m["goto"]=1;
+	m["rename"]=2;
+	m["delete_file"]=3;
 
 	const char *root;
 	char *current_root;
@@ -180,7 +182,15 @@ NONCANONICAL:
 			printf("\e[25;1H");
 			break;
 		}
-    
+    	if(s.compare("esc")==0){
+    		refresh();
+    		lowerlimit=getlowerlimit();
+			upperlimit=getupperlimit();
+			currentlimit=19;
+			currentlimit=currentlimit<upperlimit?currentlimit:upperlimit;
+			current=lowerlimit;
+			goto NONCANONICAL;
+    	}
     string word;
     vector<string> commands;
     stringstream iss(s);
@@ -189,15 +199,34 @@ NONCANONICAL:
     int size=commands.size();
     if(size>1){
     	string cs=commands[0];
+    	// printf("\e[24;1H");
+    	// printf("%s",cs.c_str());
     	switch(m[cs]){
-    		case 0:
+    		case 1:
     					gotot(commands[1]);
     					lowerlimit=getlowerlimit();
 						upperlimit=getupperlimit();
 						currentlimit=19;
 						currentlimit=currentlimit<upperlimit?currentlimit:upperlimit;
 						current=lowerlimit;
-						goto NONCANONICAL;
+						// goto NONCANONICAL;
+						break;
+			case 2:
+						rname(commands);
+						lowerlimit=getlowerlimit();
+						upperlimit=getupperlimit();
+						currentlimit=19;
+						currentlimit=currentlimit<upperlimit?currentlimit:upperlimit;
+						current=lowerlimit;
+						// goto NONCANONICAL;	
+    					break;
+    		case 3:
+    					delfile(commands);
+    					lowerlimit=getlowerlimit();
+						upperlimit=getupperlimit();
+						currentlimit=19;
+						currentlimit=currentlimit<upperlimit?currentlimit:upperlimit;
+						current=lowerlimit;
     	}
     }
     else{

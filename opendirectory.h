@@ -26,4 +26,5 @@ void setroot(string);
 void goleft();
 void goright();
 void gohome();
+void refresh();
 #endif  /*INC_MODULE1_H*/

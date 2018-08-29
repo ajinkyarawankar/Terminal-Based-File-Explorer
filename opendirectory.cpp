@@ -39,6 +39,33 @@ int getupperlimit(){
 	return upperlimit;
 }
 
+void refresh(){
+		printf("\e[2J");
+	    printf("\e[1;1H");
+		int n,l,i;
+		n=scandir(".",&namelist,0,alphasort);
+		//char *r1=root;
+		char *r2=realpath(".",NULL);
+		int check=root.compare(r2);
+		if(check==0){
+			namelist[1]=namelist[0];
+		}
+		if(n>19) l=20;
+		else l=n;
+	for (i = 0; i < l; i++) {
+            printFileType(namelist[i]); 
+            printFilePermissions(namelist[i]);
+            printFileName(namelist[i]);
+            printUserName(namelist[i]);
+            printGroupName(namelist[i]);
+            printFileSize(namelist[i]);
+            printFileTime(namelist[i]);
+            //free(namelist[i]);
+        }
+            lowerlimit=0;
+            upperlimit=n-1;
+            printf("\e[1;1H");
+}
 void gohome(){
 	int i,n,l;
 	const char *cr=root.c_str();
