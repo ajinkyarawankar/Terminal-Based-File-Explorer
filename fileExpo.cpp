@@ -16,6 +16,8 @@ int main(int argc, char const *argv[]){
 	m["goto"]=1;
 	m["rename"]=2;
 	m["delete_file"]=3;
+	m["create_dir"]=4;
+	m["create_file"]=5;
 
 	const char *root;
 	char *current_root;
@@ -27,6 +29,7 @@ int main(int argc, char const *argv[]){
 
 	setroot(root);
 	setrootc(root);
+	printf("\e[8;30;100t");
 	printf("\e[1J");
 	printf("\e[1;1H");
 
@@ -35,7 +38,7 @@ int main(int argc, char const *argv[]){
 	char c;
 	string s;
 	newt=oldt;
-	newt.c_lflag = newt.c_lflag & ~(ICANON);
+	newt.c_lflag = newt.c_lflag & ~(ECHO | ICANON);
 	newt.c_lflag=1;
 	
 
@@ -60,6 +63,8 @@ NONCANONICAL:
 			goright();
 			lowerlimit=getlowerlimit();
 			upperlimit=getupperlimit();
+			currentlimit=19;
+			currentlimit=currentlimit<upperlimit?currentlimit:upperlimit;
 			current=lowerlimit;
 		}
         //left arrow
@@ -67,6 +72,8 @@ NONCANONICAL:
 			goleft();
 			lowerlimit=getlowerlimit();
 			upperlimit=getupperlimit();
+			currentlimit=19;
+			currentlimit=currentlimit<upperlimit?currentlimit:upperlimit;
 			current=lowerlimit;
 		}
 
@@ -161,11 +168,16 @@ NONCANONICAL:
 		}
 
 		if(c==':') {
-			printf("\e[22;1H");
-			printf("\e[2K");
-			printf(":");
+			// printf("\e[22;1H");
+			// printf("\e[2K");
+			// printf(":");
+			addfooter();
 			break;
 		}
+		// printf("\e[25;1H");
+  //   	printf("\e[2K");
+  //       printf("Made by Ajinkya");
+  //       printf()
 
 	}
 
@@ -179,7 +191,7 @@ NONCANONICAL:
 		string command;
 		getline(cin,s);
 		if(s.compare("exit")==0){
-			printf("\e[25;1H");
+			printf("\e[29;1H");
 			break;
 		}
     	if(s.compare("esc")==0){
@@ -227,6 +239,23 @@ NONCANONICAL:
 						currentlimit=19;
 						currentlimit=currentlimit<upperlimit?currentlimit:upperlimit;
 						current=lowerlimit;
+						break;
+			case 4:
+						create_dir(commands);
+						lowerlimit=getlowerlimit();
+						upperlimit=getupperlimit();
+						currentlimit=19;
+						currentlimit=currentlimit<upperlimit?currentlimit:upperlimit;
+						current=lowerlimit;
+						break;
+			case 5:
+						create_file(commands);
+						lowerlimit=getlowerlimit();
+						upperlimit=getupperlimit();
+						currentlimit=19;
+						currentlimit=currentlimit<upperlimit?currentlimit:upperlimit;
+						current=lowerlimit;
+						break;
     	}
     }
     else{
@@ -237,10 +266,10 @@ NONCANONICAL:
     	printf("\e[2K");
     	printf(":");
     }
-		printf("\e[22;1H");
-		printf("\e[2K");
-		printf(":");
-
+		// printf("\e[22;1H");
+		// printf("\e[2K");
+		// printf(":");
+		addfooter();
 	}
 
 }

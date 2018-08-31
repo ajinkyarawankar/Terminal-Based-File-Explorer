@@ -5,6 +5,8 @@
 #include<dirent.h>
 #include <unistd.h>
 #include<vector>
+#include<sys/stat.h>
+#include<fstream>
 using namespace std;
 
 struct dirent **namelistc;
@@ -109,6 +111,130 @@ void rname(vector<string> v){
     }
 	}
 	else{
+		printf("\e[23;1H");
+    	printf("\e[2K");
+        printf("r command invalid");
+        printf("\e[22;1H");
+    	printf("\e[2K");
+    	printf(":");
+	}
+}
+
+void addfooter(){
+
+		printf("\e[25;1H");
+    	printf("\e[2K");
+        printf("Made by Ajinkya");
+        printf("\e[22;1H");
+    	printf("\e[2K");
+    	printf(":");
+
+
+}
+
+void create_dir(vector<string> v){
+	int size =v.size();
+	if(size>2){
+	// const char *r1 =v[1].c_str();
+	// const char *r2 =v[2].c_str();
+	//const char *r1 =v[1].c_str();
+	string a2=v[2];
+	int l=a2.length();
+	//const char *r2 =(a2.substr(2,l-2)).c_str();
+	char c=a2[0];
+	if(c=='~')
+		a2=rootc+"/"+a2.substr(1,l-1)+"/"+v[1];
+	else if(c=='.')
+		{
+			char* path=realpath(".",NULL);
+			a2=path;
+			a2=a2+"/"+v[1];
+		}
+	else{
+		goto END;
+	}
+	const char* r3=a2.c_str();
+
+	int status;
+    status = mkdir(r3,0777);
+    if(status==0){
+    	printf("\e[2J");
+	    printf("\e[1;1H");
+	    refresh();
+	    printf("\e[23;1H");
+    	printf("\e[2K");
+    	printf("create_dir success");
+    	printf("\e[22;1H");
+    	printf("\e[2K");
+    	printf(":");
+    }
+    else{
+    	printf("\e[23;1H");
+    	printf("\e[2K");
+    	printf("create_dir failed");
+    	printf("\e[22;1H");
+    	printf("\e[2K");
+    	printf(":");
+    }
+	}
+	else{
+		END:
+		printf("\e[23;1H");
+    	printf("\e[2K");
+        printf("r command invalid");
+        printf("\e[22;1H");
+    	printf("\e[2K");
+    	printf(":");
+	}
+}
+
+void create_file(vector<string> v){
+	int size =v.size();
+	if(size>2){
+	string a2=v[2];
+	int l=a2.length();
+	char c=a2[0];
+	if(c=='~')
+		a2=rootc+"/"+a2.substr(1,l-1)+"/"+v[1];
+	else if(c=='.')
+		{
+			char* path=realpath(".",NULL);
+			a2=path;
+			a2=a2+"/"+v[1];
+		}
+	else{
+		goto END;
+	}
+	const char* r3=a2.c_str();
+	ofstream myfile;
+	myfile.open (r3);
+	if(myfile.is_open())
+	{
+
+		printf("\e[2J");
+	    printf("\e[1;1H");
+	    refresh();
+	    printf("\e[23;1H");
+    	printf("\e[2K");
+    	printf("create_file success");
+    	printf("\e[22;1H");
+    	printf("\e[2K");
+    	printf(":");
+	}
+	else{
+		printf("\e[23;1H");
+    	printf("\e[2K");
+    	printf("create_file failed");
+    	printf("\e[22;1H");
+    	printf("\e[2K");
+    	printf(":");
+
+	}
+	myfile.close();
+   
+	}
+	else{
+		END:
 		printf("\e[23;1H");
     	printf("\e[2K");
         printf("r command invalid");

@@ -10,5 +10,8 @@ void gotot(string);
 void setrootc(string);
 void rname(vector<string>);
 void delfile(vector<string>);
+void addfooter();
+void create_dir(vector<string>);
+void create_file(vector<string>);
 
 #endif
