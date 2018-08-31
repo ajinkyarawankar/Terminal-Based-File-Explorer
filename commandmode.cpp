@@ -2,11 +2,14 @@
 #include"opendirectory.h"
 #include<iostream>
 #include<string>
-#include<dirent.h>
+#include <dirent.h>
 #include <unistd.h>
 #include<vector>
 #include<sys/stat.h>
 #include<fstream>
+#include<dirent.h>
+#include <sys/stat.h>
+
 using namespace std;
 
 struct dirent **namelistc;
@@ -15,6 +18,107 @@ void setrootc(string rt){
  rootc =rt;
 
 }
+
+void copydirectory(const char *dirname,const char *desname){
+
+    struct dirent **namelist;
+    string path,despath;
+    int n;
+    chdir(dirname);
+    mkdir(desname,0777);
+    n=scandir(".",&namelist,0,alphasort);
+    for(int i=2;i<n;i++){
+
+            if (namelist[i]->d_type == DT_DIR) {
+                despath=desname;
+                despath=despath+"/"+namelist[i]->d_name;
+                path=dirname;
+                path=path+"/"+namelist[i]->d_name;
+                copydirectory(path.c_str(),despath.c_str());
+            }
+            else
+            {
+                despath=desname;
+                despath=despath+"/"+namelist[i]->d_name;
+                path=dirname;
+                path=path+"/"+namelist[i]->d_name;
+                ifstream f(despath);
+    if(f.good()){}
+                else{
+                std::ifstream  src(path, std::ios::binary);
+                std::ofstream  dst(despath,   std::ios::binary);
+                dst << src.rdbuf();
+                }
+            }
+}
+chdir("..");
+}
+
+void copyfile(const char *path ,const char *despath){
+	ifstream f(despath);
+    if(f.good()){}
+                else{
+                std::ifstream  src(path, std::ios::binary);
+                std::ofstream  dst(despath, std::ios::binary);
+                dst << src.rdbuf();
+}
+}
+
+void copyhelper(vector<string> v){
+    int size =v.size();
+	if(size>2){
+	const char *copyroot;
+	copyroot=realpath(".",NULL);
+	string dirn=copyroot;
+	dirn=dirn+"/"; 
+	dirn=dirn+v[1];
+	string desn=rootc;
+	desn=desn+"/";
+	string vs=v[size-1];
+	char ch=vs[0];
+	if(ch=='~'){
+		string vp=vs.substr(1,vs.length()-1);
+	desn=desn+vp;
+	for(int i=1;i<size-1;i++)
+	{	
+		struct stat st;
+		copyroot=realpath(".",NULL);
+		string dirn=copyroot;
+		dirn=dirn+"/"; 
+		dirn=dirn+v[i];
+		desn=desn+"/";
+		stat(dirn.c_str(),&st);
+		if(S_ISDIR(st.st_mode)){
+			copydirectory(dirn.c_str(),(desn+v[i]).c_str());
+		}
+		else{
+			copyfile(dirn.c_str(),(desn+v[i]).c_str());
+		}
+	}
+	}	
+	else goto CI; 
+	chdir(copyroot);
+		printf("\e[2J");
+	    printf("\e[1;1H");
+	    refresh();
+	    printf("\e[23;1H");
+    	printf("\e[2K");
+    	printf("copy success");
+    	printf("\e[22;1H");
+    	printf("\e[2K");
+    	printf(":");
+	}
+	else{
+		CI:
+		printf("\e[23;1H");
+    	printf("\e[2K");
+        printf("d command invalid");
+        printf("\e[22;1H");
+    	printf("\e[2K");
+    	printf(":");
+	}
+}
+
 
 void delfile(vector<string> v){
 	int size =v.size();
@@ -113,7 +217,7 @@ void rname(vector<string> v){
 	else{
 		printf("\e[23;1H");
     	printf("\e[2K");
-        printf("r command invalid");
+        printf("command invalid");
         printf("\e[22;1H");
     	printf("\e[2K");
     	printf(":");
@@ -206,6 +310,16 @@ void create_file(vector<string> v){
 		goto END;
 	}
 	const char* r3=a2.c_str();
+	ifstream f(r3);
+	if(f.good()){
+		printf("\e[23;1H");
+    	printf("\e[2K");
+    	printf("file already exist");
+    	printf("\e[22;1H");
+    	printf("\e[2K");
+    	printf(":");
+	}
+	else{
 	ofstream myfile;
 	myfile.open (r3);
 	if(myfile.is_open())
@@ -233,6 +347,7 @@ void create_file(vector<string> v){
 	myfile.close();
    
 	}
+}
 	else{
 		END:
 		printf("\e[23;1H");

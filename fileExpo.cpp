@@ -18,6 +18,7 @@ int main(int argc, char const *argv[]){
 	m["delete_file"]=3;
 	m["create_dir"]=4;
 	m["create_file"]=5;
+	m["copy"]=6;
 
 	const char *root;
 	char *current_root;
@@ -250,6 +251,14 @@ NONCANONICAL:
 						break;
 			case 5:
 						create_file(commands);
+						lowerlimit=getlowerlimit();
+						upperlimit=getupperlimit();
+						currentlimit=19;
+						currentlimit=currentlimit<upperlimit?currentlimit:upperlimit;
+						current=lowerlimit;
+						break;
+			case 6:
+						copyhelper(commands);
 						lowerlimit=getlowerlimit();
 						upperlimit=getupperlimit();
 						currentlimit=19;
