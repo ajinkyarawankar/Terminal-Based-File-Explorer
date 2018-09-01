@@ -20,6 +20,8 @@ int main(int argc, char const *argv[]){
 	m["create_file"]=5;
 	m["copy"]=6;
 	m["move"]=7;
+	m["delete_dir"]=8;
+	m["snapshot"]=9;
 
 	const char *root;
 	char *current_root;
@@ -268,6 +270,30 @@ NONCANONICAL:
 						break;
 			case 7:
 						movehelper(commands);
+						lowerlimit=getlowerlimit();
+						upperlimit=getupperlimit();
+						currentlimit=19;
+						currentlimit=currentlimit<upperlimit?currentlimit:upperlimit;
+						current=lowerlimit;
+						break;
+			case 8:
+						delete_dir(commands);
+						lowerlimit=getlowerlimit();
+						upperlimit=getupperlimit();
+						currentlimit=19;
+						currentlimit=currentlimit<upperlimit?currentlimit:upperlimit;
+						current=lowerlimit;
+						break;
+			case 9:
+						snapshothelper(commands);
+						lowerlimit=getlowerlimit();
+						upperlimit=getupperlimit();
+						currentlimit=19;
+						currentlimit=currentlimit<upperlimit?currentlimit:upperlimit;
+						current=lowerlimit;
+						break;
+			case 10:
+						searchhelper(commands);
 						lowerlimit=getlowerlimit();
 						upperlimit=getupperlimit();
 						currentlimit=19;

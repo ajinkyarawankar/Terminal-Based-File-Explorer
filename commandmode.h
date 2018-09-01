@@ -19,4 +19,10 @@ void copyfile(const char *,const char *);
 void movehelper(vector<string>);
 void movefile(const char *,const char *);
 void movedirectory(const char *,const char *);
+void delete_dir(vector<string>);
+void delete_all(const char *);
+void snapshothelper(vector<string>);
+void snapshot(const char *);
+void searchhelper(vector<string>);
+
 #endif

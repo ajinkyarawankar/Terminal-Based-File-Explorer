@@ -12,11 +12,151 @@
 
 using namespace std;
 
+ofstream myfile;
+
 struct dirent **namelistc;
 string rootc;
+int rlen;
 void setrootc(string rt){
  rootc =rt;
+rlen=rootc.length();
+}
 
+
+void searchhelper(vector<string> v){
+	
+}
+void snapshothelper(vector<string> v){
+	int size =v.size();
+	if(size>2){
+	string filename=rootc;
+	filename=filename+"/";
+	filename=filename+v[2];
+	
+	// ifstream f(filename.c_str());
+ //    if(f.good()){remove(filename.c_str());}
+const char *r1=realpath(".",NULL);
+    myfile.open(filename.c_str()); 
+    string arg=v[1];
+    if(arg.length()==1){
+    	
+    	arg=r1;
+    }
+    else {
+    	arg=r1;
+    	arg=arg+"/"+v[1];
+    }
+   
+    if(rootc.compare(arg)==0) myfile<<"Root";
+    // else {
+    // 	string temp=r1;
+    // 	temp.erase(0,rlen);
+    // 	myfile<<temp;
+    // }
+        snapshot(arg.c_str());
+        chdir(r1);
+        myfile.close();
+    	printf("\e[2J");
+	    printf("\e[1;1H");
+	    refresh();
+	    printf("\e[23;1H");
+    	printf("\e[2K");
+    	printf("snapshot success");
+    	printf("\e[22;1H");
+    	printf("\e[2K");
+    	printf(":");
+	}
+	else{
+		printf("\e[23;1H");
+    	printf("\e[2K");
+        printf("d command invalid");
+        printf("\e[22;1H");
+    	printf("\e[2K");
+    	printf(":");
+	}
+}
+
+void snapshot(const char *r){
+
+string p=r;
+string temp=p;
+temp.erase(0,rlen);
+myfile<<"\n"<<temp<<"\n";
+
+	struct dirent **namelist;
+    string path;
+    int n;
+    chdir(r);
+    n=scandir(".",&namelist,0,alphasort);
+    for(int i=2;i<n;i++){
+    	myfile<<namelist[i]->d_name<<"\t";
+    }
+    for(int i=2;i<n;i++){
+    	if (namelist[i]->d_type == DT_DIR) {
+                
+                path=r;
+                path=path+"/"+namelist[i]->d_name;
+                snapshot(path.c_str());
+            }
+    }
+chdir("..");
+
+}
+
+
+
+void delete_all(const char *dirname){
+
+	struct dirent **namelist;
+    string path;
+    int n;
+    chdir(dirname);
+    n=scandir(".",&namelist,0,alphasort);
+    for(int i=2;i<n;i++){
+
+            if (namelist[i]->d_type == DT_DIR) {
+                
+                path=dirname;
+                path=path+"/"+namelist[i]->d_name;
+                delete_all(path.c_str());
+                rmdir(path.c_str());
+            }
+            else
+            {
+               
+                path=dirname;
+                path=path+"/"+namelist[i]->d_name;
+               	remove(path.c_str());
+            }
+}
+chdir("..");
+}
+
+void delete_dir(vector<string> v){
+	int size =v.size();
+	if(size>1){
+	string c=rootc+"/"+v[1];
+	const char *r1=c.c_str();
+    delete_all(r1);
+    rmdir(r1);
+    	printf("\e[2J");
+	    printf("\e[1;1H");
+	    refresh();
+	    printf("\e[23;1H");
+    	printf("\e[2K");
+    	printf("delete success");
+    	printf("\e[22;1H");
+    	printf("\e[2K");
+    	printf(":");
+	}
+	else{
+		printf("\e[23;1H");
+    	printf("\e[2K");
+        printf("d command invalid");
+        printf("\e[22;1H");
+    	printf("\e[2K");
+    	printf(":");
+	}
 }
 void movehelper(vector<string> v){
 	int size =v.size();

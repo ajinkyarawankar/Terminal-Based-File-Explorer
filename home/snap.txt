@@ -1,0 +1,11 @@
+
+/baby//home
+abc	c	vid.mp4	
+/baby//home/abc
+b	hey	ohh	test	
+/baby//home/abc/hey
+b	sj	test	
+/baby//home/abc/hey/sj
+last	
+/baby//home/abc/ohh
+b	test	
