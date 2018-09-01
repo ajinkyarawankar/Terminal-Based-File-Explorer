@@ -16,5 +16,7 @@ void create_file(vector<string>);
 void copyhelper(vector<string>);
 void copydirectory(const char *,const char *);
 void copyfile(const char *,const char *);
-
+void movehelper(vector<string>);
+void movefile(const char *,const char *);
+void movedirectory(const char *,const char *);
 #endif
