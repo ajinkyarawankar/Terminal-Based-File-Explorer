@@ -95,6 +95,7 @@ else{
 }
 
 void gohome(){
+	if(searchflag==1) searchflag=0;
 	int i,n,l;
 	const char *cr=root.c_str();
 	// printf("%s",cr);
@@ -135,7 +136,7 @@ void gohome(){
 
 //to go forward
 void goright(){
-
+if(searchflag==1) searchflag=0;
 	int n,i,l;
 	if(rightstack.empty()){
 		printf("\e[23;1H");
@@ -258,9 +259,7 @@ void openFile(int c){
 				waitpid(pid, &status, 0);
 	
 }
-void snapshot(){
 
-}
 
 //print directory content in the given window
 void printCustomDirectory(int lowerlimit,int currentlimit){
@@ -360,7 +359,7 @@ bool checkDirectory(int c){
 //scan directory after pressing enter with the help of indexs
 void scanDirectory(int c){
 	int i,n,t,l;
-
+if(searchflag==1) searchflag=0;
 	//n=scandir(current->d_name,&namelist,0,alphasort);
 	t=namelist[c]->d_type;
 	dirent *temp;
