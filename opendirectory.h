@@ -1,11 +1,13 @@
 #include <iostream>
 #include <dirent.h>
 #include <string>
+#include<vector>
 using namespace std;
 
 #ifndef INC_OPENDIRECTORY_H
 #define INC_OPENDIRECTORY_H
 
+void setvector(vector<string>,int);
 void scanDirectory(const char *,int);
 void scandirectory(const char *);
 void printFileType(dirent *); 

@@ -22,7 +22,7 @@ int main(int argc, char const *argv[]){
 	m["move"]=7;
 	m["delete_dir"]=8;
 	m["snapshot"]=9;
-
+	m["search"]=10;
 	const char *root;
 	char *current_root;
 	int lowerlimit,upperlimit,currentlimit=19,current=0;

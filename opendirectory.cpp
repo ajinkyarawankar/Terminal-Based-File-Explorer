@@ -13,6 +13,7 @@
 #include<sys/wait.h>
 #include<string>
 #include<stack>
+#include<vector>
 using namespace std;
 int  lowerlimit,upperlimit;
 
@@ -20,16 +21,26 @@ struct dirent **namelist;
 dirent *prev;
 dirent *current;
 string root;
-
+int len;
 stack<char *> leftstack;
 stack<char *> rightstack;
+
+vector<string> searchlist1;
+int searchlimit;
+int searchflag=0;
+void setvector(vector<string> v,int limit){
+searchlist1=v;
+searchlimit=limit;
+searchflag=1;
+}
+
 
 string getroot(){
 	return root;
 }
 void setroot(string rt){
  root =rt;
-
+len=root.length();
 }
 int getlowerlimit(){
 	return lowerlimit;
@@ -40,7 +51,22 @@ int getupperlimit(){
 }
 
 void refresh(){
-		printf("\e[2J");
+		if(searchflag==1){
+			printf("\e[2J");
+	    printf("\e[1;1H");
+	    for(int i=0;i<searchlimit;i++){
+	    	string ss=searchlist1[i];
+	    	ss.erase(0,len);
+	    	ss="~"+ss;
+    	printf("%s\n",ss.c_str());
+	    }
+	    lowerlimit=0;
+	    upperlimit=searchlimit-1;
+	    printf("\e[1;1H");
+	}
+		
+else{
+			printf("\e[2J");
 	    printf("\e[1;1H");
 		int n,l,i;
 		n=scandir(".",&namelist,0,alphasort);
@@ -65,7 +91,9 @@ void refresh(){
             lowerlimit=0;
             upperlimit=n-1;
             printf("\e[1;1H");
+    }
 }
+
 void gohome(){
 	int i,n,l;
 	const char *cr=root.c_str();
@@ -158,6 +186,10 @@ void goright(){
 //to go backwards
 void goleft(){
 	int n,i,l;
+	if(searchflag==1){
+		searchflag=0;
+		if(leftstack.empty()) gohome();
+	}
 	if(leftstack.empty()){
 		printf("\e[23;1H");
 		printf("\e[2K");
@@ -215,7 +247,11 @@ void openFile(int c){
 					printf("\e[22;1H");
 				    printf("\e[2K");
 				    printf("\n");
-					execl("/usr/bin/xdg-open","xdg-open",namelist[c]->d_name,NULL);
+				    if(searchflag==1){
+				    		searchflag=0;
+				    execl("/usr/bin/xdg-open","xdg-open",(searchlist1[c]).c_str(),NULL);			
+				    }
+				    else execl("/usr/bin/xdg-open","xdg-open",namelist[c]->d_name,NULL);
 					exit(1);
 					printf("\e[1;1H");
 				}

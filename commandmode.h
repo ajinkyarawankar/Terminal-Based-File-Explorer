@@ -24,5 +24,7 @@ void delete_all(const char *);
 void snapshothelper(vector<string>);
 void snapshot(const char *);
 void searchhelper(vector<string>);
+void search(const char *);
+void printFail();
 
 #endif

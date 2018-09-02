@@ -15,8 +15,13 @@ using namespace std;
 ofstream myfile;
 
 struct dirent **namelistc;
+//struct dirent **searchlist;
+vector<string> searchlist;
+int searchpos=0;
 string rootc;
+string searchFile;
 int rlen;
+int flag=0;
 void setrootc(string rt){
  rootc =rt;
 rlen=rootc.length();
@@ -24,9 +29,86 @@ rlen=rootc.length();
 
 
 void searchhelper(vector<string> v){
+	const char *r=realpath(".",NULL);
+	int size =v.size();
+	if(size>1){
+	searchFile=v[1].c_str();
+    //free(searchlist);
+    searchpos=0;
+    search(r);
+    chdir(r);
+    	printf("\e[2J");
+	    printf("\e[1;1H");
+	  //  refresh();
+	    if(searchpos>0)
+	    {
+	    // 	string ss=searchlist[i];
+	    // 	ss.erase(0,rlen);
+	    // 	ss="~"+ss;
+    	// printf("%s\n",ss.c_str());
+    	setvector(searchlist,searchpos);
+    	}
+    	refresh();
+	    printf("\e[23;1H");
+    	printf("\e[2K");
+    	printf("search success");
+    	if(searchpos==0){
+    		printf("\e[24;1H");
+    	printf("\e[2K");
+    	printf("no result found");
+    	}
+    	printf("\e[22;1H");
+    	printf("\e[2K");
+    	printf(":");
+    
 	
 }
+	else{
+		printf("\e[23;1H");
+    	printf("\e[2K");
+        printf("d command invalid");
+        printf("\e[22;1H");
+    	printf("\e[2K");
+    	printf(":");
+	}
+
+}
+
+void search(const char *apath){
+
+	struct dirent **namelist;
+    string path;
+    int n;
+    chdir(apath);
+    n=scandir(".",&namelist,0,alphasort);
+    for(int i=2;i<n;i++){
+
+            if (namelist[i]->d_type == DT_DIR) {
+                
+                path=apath;
+                path=path+"/"+namelist[i]->d_name;
+                search(path.c_str());
+            }
+            else
+            {
+               
+                string check=namelist[i]->d_name;
+          //      printf("%s",check);
+                if(check.compare(searchFile)==0){
+                	const char *sl=realpath(namelist[i]->d_name,NULL);
+                		searchlist.push_back(sl);
+                		searchpos++;
+                }
+               	
+            }
+}
+chdir("..");
+
+}
+
+
 void snapshothelper(vector<string> v){
+	flag=0;
 	int size =v.size();
 	if(size>2){
 	string filename=rootc;
@@ -53,7 +135,11 @@ const char *r1=realpath(".",NULL);
     // 	temp.erase(0,rlen);
     // 	myfile<<temp;
     // }
+    struct stat st;
+    if(stat(arg.c_str(),&st)==0){
         snapshot(arg.c_str());
+    }
+    else flag=1;
         chdir(r1);
         myfile.close();
     	printf("\e[2J");
@@ -62,6 +148,10 @@ const char *r1=realpath(".",NULL);
 	    printf("\e[23;1H");
     	printf("\e[2K");
     	printf("snapshot success");
+    	if(flag==1) {
+    		printFail();
+    		flag=0;
+    	}
     	printf("\e[22;1H");
     	printf("\e[2K");
     	printf(":");
@@ -137,14 +227,22 @@ void delete_dir(vector<string> v){
 	if(size>1){
 	string c=rootc+"/"+v[1];
 	const char *r1=c.c_str();
+	struct stat st;
+	if(stat(r1,&st)==0){
     delete_all(r1);
     rmdir(r1);
+	}
+	else{
+		flag=1;
+	}
     	printf("\e[2J");
 	    printf("\e[1;1H");
 	    refresh();
 	    printf("\e[23;1H");
     	printf("\e[2K");
     	printf("delete success");
+    	if(flag==1) {printFail();
+    		flag=0;}
     	printf("\e[22;1H");
     	printf("\e[2K");
     	printf(":");
@@ -159,6 +257,7 @@ void delete_dir(vector<string> v){
 	}
 }
 void movehelper(vector<string> v){
+	flag=0;
 	int size =v.size();
 	if(size>2){
 	const char *copyroot;
@@ -181,7 +280,7 @@ void movehelper(vector<string> v){
 		dirn=dirn+"/"; 
 		dirn=dirn+v[i];
 		desn=desn+"/";
-		stat(dirn.c_str(),&st);
+		if(stat(dirn.c_str(),&st)==0){
 		if(S_ISDIR(st.st_mode)){
 			movedirectory(dirn.c_str(),(desn+v[i]).c_str());
 			rmdir(dirn.c_str());
@@ -189,6 +288,10 @@ void movehelper(vector<string> v){
 		else{
 			movefile(dirn.c_str(),(desn+v[i]).c_str());
 		}
+	}
+	else{
+		flag=1;
+	}
 	}
 	}	
 	else goto CI; 
@@ -199,6 +302,8 @@ void movehelper(vector<string> v){
 	    printf("\e[23;1H");
     	printf("\e[2K");
     	printf("move success");
+    	if(flag==1) printFail();
+    	flag=0;
     	printf("\e[22;1H");
     	printf("\e[2K");
     	printf(":");
@@ -255,8 +360,14 @@ void movefile(const char *path,const char *despath){
                 std::ofstream  dst(despath, std::ios::binary);
                 dst << src.rdbuf();
             }
+    ifstream f2(despath);
+    if(f2.good()){}
+    	else{
+    		flag=1;
+    	}
             remove(path);
-}
+    	}
+
 
 void copydirectory(const char *dirname,const char *desname){
 
@@ -298,9 +409,22 @@ void copyfile(const char *path ,const char *despath){
                 std::ofstream  dst(despath, std::ios::binary);
                 dst << src.rdbuf();
 }
+ifstream f2(path);
+    if(f2.good()){}
+    else{
+    	flag=1;
+    }
+
 }
 
+void printFail(){
+	printf("\e[24;1H");
+    	printf("\e[2K");
+    	printf("operation failed for some file due to incorrect source or destination");
+}
 void copyhelper(vector<string> v){
+
+	flag=0;
     int size =v.size();
 	if(size>2){
 	const char *copyroot;
@@ -323,7 +447,7 @@ void copyhelper(vector<string> v){
 		dirn=dirn+"/"; 
 		dirn=dirn+v[i];
 		desn=desn+"/";
-		stat(dirn.c_str(),&st);
+		if(stat(dirn.c_str(),&st)==0){
 		if(S_ISDIR(st.st_mode)){
 			copydirectory(dirn.c_str(),(desn+v[i]).c_str());
 		}
@@ -331,15 +455,22 @@ void copyhelper(vector<string> v){
 			copyfile(dirn.c_str(),(desn+v[i]).c_str());
 		}
 	}
+	else{
+		flag=1;
+	}
+	}
 	}	
 	else goto CI; 
 	chdir(copyroot);
+
 		printf("\e[2J");
 	    printf("\e[1;1H");
 	    refresh();
 	    printf("\e[23;1H");
     	printf("\e[2K");
     	printf("copy success");
+    	if(flag==1) printFail();
+    	flag=0;
     	printf("\e[22;1H");
     	printf("\e[2K");
     	printf(":");
