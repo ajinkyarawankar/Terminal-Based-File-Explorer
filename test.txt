@@ -1,4 +1,0 @@
-total 20
--rwxr-xr-x 1 ajinkya ajinkya 13680 Aug 22 21:58 test
--rw-r--r-- 1 ajinkya ajinkya   427 Aug 22 21:58 testCommand.cpp
--rw-r--r-- 1 ajinkya ajinkya     0 Aug 22 21:58 test.txt
