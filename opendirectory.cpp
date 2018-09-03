@@ -1,3 +1,5 @@
+// RollNo--2018201020 Name--Ajinkya Rawankar
+
 #include"opendirectory.h"
 #include <dirent.h>
 #include <stdio.h>
@@ -136,7 +138,8 @@ void gohome(){
 
 //to go forward
 void goright(){
-if(searchflag==1) searchflag=0;
+if(searchflag==1) {searchflag=0;
+	refresh();}
 	int n,i,l;
 	if(rightstack.empty()){
 		printf("\e[23;1H");
@@ -147,7 +150,7 @@ if(searchflag==1) searchflag=0;
 	else{
 		printf("\e[2J");
 	    printf("\e[1;1H");
-		dirent *temp;
+		//dirent *temp;
 		
 		//temp=leftstack.top();
 		char *fromstack=rightstack.top();
@@ -200,7 +203,7 @@ void goleft(){
 	else{
 		printf("\e[2J");
 	    printf("\e[1;1H");
-		dirent *temp;
+		//dirent *temp;
 		
 		//temp=leftstack.top();
 		char *fromstack=leftstack.top();
@@ -240,7 +243,7 @@ void goleft(){
 //open the file after pressing enter
 void openFile(int c){
 	pid_t pid;
-	int s=0;
+	//int s=0;
 	int status;
 	
 				pid=fork();
@@ -254,7 +257,7 @@ void openFile(int c){
 				    }
 				    else execl("/usr/bin/xdg-open","xdg-open",namelist[c]->d_name,NULL);
 					exit(1);
-					printf("\e[1;1H");
+					//printf("\e[1;1H");
 				}
 				waitpid(pid, &status, 0);
 	
@@ -277,9 +280,9 @@ void printCustomDirectory(int lowerlimit,int currentlimit){
 
 void scandirectory(const char *r){
 	int n,l,i;
-
+		
 		char *r1=realpath(".",NULL);
-
+		
 	    chdir(r);
 		n=scandir(".",&namelist,0,alphasort);
 		//char *r1=root;
@@ -359,7 +362,7 @@ bool checkDirectory(int c){
 //scan directory after pressing enter with the help of indexs
 void scanDirectory(int c){
 	int i,n,t,l;
-if(searchflag==1) searchflag=0;
+	
 	//n=scandir(current->d_name,&namelist,0,alphasort);
 	t=namelist[c]->d_type;
 	dirent *temp;
@@ -367,11 +370,30 @@ if(searchflag==1) searchflag=0;
 	//printf("%d",t==DT_DIR);
 	if(t==DT_DIR){
 
+
 		char *tostack=realpath(".",NULL);
 		leftstack.push(tostack);
 		free(namelist);
-		
-		chdir(temp->d_name);
+		if(c==1){
+			while(!rightstack.empty()){
+				rightstack.pop();
+			}	
+			leftstack.pop();
+		}
+
+		const char *rr;
+if(searchflag==1){
+				    		searchflag=0;
+				    		rr=(searchlist1[c]).c_str();
+				    		if(chdir(rr)!=0){
+				    			printf("\e[2J");
+				    			printf("\e[23;1H");
+    							printf("\e[2K");
+				    			printf("cannot open this");
+				    			printf("\e[1;1H");
+				    		}
+				    }
+		else chdir(temp->d_name);
 
 		n=scandir(".",&namelist,0,alphasort);
 		//char *r1=root;

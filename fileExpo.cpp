@@ -1,3 +1,5 @@
+// RollNo--2018201020 Name--Ajinkya Rawankar
+
 #include <stdio.h>
 #include<iostream>
 #include<string.h>
@@ -24,7 +26,7 @@ int main(int argc, char const *argv[]){
 	m["snapshot"]=9;
 	m["search"]=10;
 	const char *root;
-	char *current_root;
+	//char *current_root;
 	int lowerlimit,upperlimit,currentlimit=19,current=0;
 	if(argc==1)
 	    root=realpath(".",NULL);
@@ -140,7 +142,7 @@ NONCANONICAL:
 			else{
 				
 				openFile(current);
-				sleep(1);
+				sleep(3);
 				printf("\e[1;1H");
 				current=lowerlimit;
 			}
@@ -177,6 +179,19 @@ NONCANONICAL:
 			// printf(":");
 			addfooter();
 			break;
+		}
+
+		if(c==113){
+			printf("\e[26;1H");
+			goto QUIT;
+		}
+		if(c==114){
+	    	refresh();
+	    	lowerlimit=getlowerlimit();
+			upperlimit=getupperlimit();
+			currentlimit=19;
+			currentlimit=currentlimit<upperlimit?currentlimit:upperlimit;
+			current=0;
 		}
 		// printf("\e[25;1H");
   //   	printf("\e[2K");
@@ -315,5 +330,6 @@ NONCANONICAL:
 		// printf(":");
 		addfooter();
 	}
-
+QUIT:
+tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
 }

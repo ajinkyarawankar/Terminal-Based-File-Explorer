@@ -1,3 +1,5 @@
+// RollNo--2018201020 Name--Ajinkya Rawankar
+
 #include"commandmode.h"
 #include"opendirectory.h"
 #include<iostream>
@@ -83,24 +85,31 @@ void search(const char *apath){
     n=scandir(".",&namelist,0,alphasort);
     for(int i=2;i<n;i++){
 
+    	 string check=namelist[i]->d_name;
+          //      printf("%s",check);
+                if(check.compare(searchFile)==0){
+                	const char *sl=realpath(namelist[i]->d_name,NULL);
+                		searchlist.push_back(sl);
+                		searchpos++;
+                	}
             if (namelist[i]->d_type == DT_DIR) {
                 
                 path=apath;
                 path=path+"/"+namelist[i]->d_name;
                 search(path.c_str());
             }
-            else
-            {
+          //   else
+          //   {
                
-                string check=namelist[i]->d_name;
-          //      printf("%s",check);
-                if(check.compare(searchFile)==0){
-                	const char *sl=realpath(namelist[i]->d_name,NULL);
-                		searchlist.push_back(sl);
-                		searchpos++;
-                }
+          //       string check=namelist[i]->d_name;
+          // //      printf("%s",check);
+          //       if(check.compare(searchFile)==0){
+          //       	const char *sl=realpath(namelist[i]->d_name,NULL);
+          //       		searchlist.push_back(sl);
+          //       		searchpos++;
+          //       }
                	
-            }
+          //   }
 }
 chdir("..");
 
@@ -111,22 +120,30 @@ void snapshothelper(vector<string> v){
 	flag=0;
 	int size =v.size();
 	if(size>2){
-	string filename=rootc;
-	filename=filename+"/";
-	filename=filename+v[2];
+	string filename=v[2];
+	char ch=filename[0];
+	if(ch=='~'){
+		filename.erase(0,1);
+	}
+	filename=rootc+"/"+filename;
+	
 	
 	// ifstream f(filename.c_str());
  //    if(f.good()){remove(filename.c_str());}
 const char *r1=realpath(".",NULL);
     myfile.open(filename.c_str()); 
     string arg=v[1];
+    char chh=arg[0];
+    if(chh=='~'){
+    	arg.erase(0,1);
+    }
     if(arg.length()==1){
     	
     	arg=r1;
     }
     else {
-    	arg=r1;
-    	arg=arg+"/"+v[1];
+    	// arg=rootc;
+    	arg=rootc+"/"+arg;
     }
    
     if(rootc.compare(arg)==0) myfile<<"Root";
@@ -225,7 +242,12 @@ chdir("..");
 void delete_dir(vector<string> v){
 	int size =v.size();
 	if(size>1){
-	string c=rootc+"/"+v[1];
+	string c=v[1];
+	char ch=c[0];
+	if(ch=='~'){
+		c.erase(0,1);
+	}
+	c=rootc+"/"+c;
 	const char *r1=c.c_str();
 	struct stat st;
 	if(stat(r1,&st)==0){
@@ -490,7 +512,13 @@ void copyhelper(vector<string> v){
 void delfile(vector<string> v){
 	int size =v.size();
 	if(size>1){
-	string c=rootc+"/"+v[1];
+
+	string c=v[1];
+	char ch=c[0];
+	if(ch=='~'){
+		c.erase(0,1);
+	}
+	c=rootc+"/"+c;
 	const char *r1=c.c_str();
 	int status;
     status = remove(r1);
@@ -529,8 +557,15 @@ void delfile(vector<string> v){
 void gotot(string p){
 	int n;
 	const char *root2;
-	string check=rootc+p;
+	const char *pat=realpath(".",NULL);
+	string check=p;
+	char ch=check[0];
+	if(ch=='~'){
+		check.erase(0,1);
+	}
+	check=rootc+"/"+check;
 	root2=check.c_str();
+
 	chdir(root2);
     n=scandir(root2,&namelistc,0,alphasort);
 
@@ -546,7 +581,7 @@ void gotot(string p){
     return;
     }
     else{
-    	chdir("..");
+    	chdir(pat);
     	printf("\e[2J");
 	    printf("\e[1;1H");
 	    scandirectory(root2);
